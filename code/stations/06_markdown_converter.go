@@ -1,11 +1,32 @@
 package stations
 
+import (
+	"tobloggan/code/contracts"
+)
+
 type Markdown interface {
 	Convert(content string) (string, error)
 }
 
-//type MarkdownConverter struct{}
+type MarkdownConverter struct {
+	md Markdown
+}
 
-//func (this *MarkdownConverter) Do(input any, output func(any)) {
-//    TODO: given a contracts.Article, use the provided Markdown interface to convert and re-assign the Body field.
-//}
+func NewMarkdownConverter(md Markdown) contracts.Station {
+	return &MarkdownConverter{md: md}
+}
+
+func (this *MarkdownConverter) Do(input any, output func(any)) {
+	switch input := input.(type) {
+	case contracts.Article:
+		converted, err := this.md.Convert(input.Body)
+		if err != nil {
+			output(contracts.Errorf("%w (%w): %v", errMalformedContent, err, input))
+		} else {
+			input.Body = converted
+			output(input)
+		}
+	default:
+		output(input)
+	}
+}
