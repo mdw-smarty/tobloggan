@@ -1,15 +1,32 @@
 package stations
 
-//type ArticleRenderer struct {}
-//
-//func (this *ArticleRenderer) Do(input any, output func(any)) {
-//    TODO: combine the fields of the incoming contracts.Article with the article template (provided via the constructor),
-//    replace: {{Title}} with contracts.Article.Title
-//             {{Slug}} with contracts.Article.Slug
-//             {{Date}} with contracts.Article.Date.Format("January 2, 2006")
-//             {{Body}} with contracts.Article.Body
-//    output(contracts.Page{
-//        Path:    input.Slug,
-//        Content: replacedTemplate,
-//    })
-//}
+import (
+	"strings"
+
+	"tobloggan/code/contracts"
+)
+
+type ArticleRenderer struct {
+	template string
+}
+
+func NewArticleRenderer(template string) contracts.Station {
+	return &ArticleRenderer{template: template}
+}
+func (this *ArticleRenderer) Do(input any, output func(any)) {
+	switch input := input.(type) {
+	case contracts.Article:
+		replacer := strings.NewReplacer(
+			"{{Title}}", input.Title,
+			"{{Slug}}", input.Slug,
+			"{{Date}}", input.Date.Format("January 2, 2006"),
+			"{{Body}}", input.Body,
+		)
+		output(contracts.Page{
+			Path:    input.Slug,
+			Content: replacer.Replace(this.template),
+		})
+	default:
+		output(input)
+	}
+}
