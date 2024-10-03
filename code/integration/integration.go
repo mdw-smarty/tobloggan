@@ -31,18 +31,18 @@ func GenerateBlog(config Config) bool {
 		failure = new(atomic.Bool)
 		input   = make(chan any, 1)
 
-		scanner   = contracts.Station(nil) // stations.NewSourceScanner(config.FileSystemReader)
-		reader    = contracts.Station(nil) // stations.NewSourceReader(config.FileSystemReader)
-		parser    = contracts.Station(nil) // stations.NewArticleParser()
-		validator = contracts.Station(nil) // stations.NewArticleValidator()
-		drafts    = contracts.Station(nil) // stations.NewDraftRemoval()         // OPTIONAL
-		futures   = contracts.Station(nil) // stations.NewFutureRemoval(started) // OPTIONAL
-		markdown  = contracts.Station(nil) // stations.NewMarkdownConverter(config.MarkdownConverter)
-		listing   = contracts.Station(nil) // stations.NewListingRenderer(config.ListingTemplate)
-		renderer  = contracts.Station(nil) // stations.NewArticleRenderer(config.ArticleTemplate)
-		baseURL   = contracts.Station(nil) // stations.NewBaseURLRewriter(config.BaseURL)
-		writer    = contracts.Station(nil) // stations.NewPageWriter(config.TargetDirectory, config.FileSystemWriter)
-		reporter  = contracts.Station(nil) // stations.NewReporter(config.Logger, failure)
+		scanner   = stations.NewSourceScanner(config.FileSystemReader)
+		reader    = stations.NewSourceReader(config.FileSystemReader)
+		parser    = stations.NewArticleParser()
+		validator = stations.NewArticleValidator()
+		drafts    = stations.NewDraftRemoval()
+		futures   = stations.NewFutureRemoval(started)
+		markdown  = stations.NewMarkdownConverter(config.MarkdownConverter)
+		listing   = stations.NewListingRenderer(config.ListingTemplate)
+		renderer  = stations.NewArticleRenderer(config.ArticleTemplate)
+		baseURL   = stations.NewBaseURLRewriter(config.BaseURL)
+		writer    = stations.NewPageWriter(config.TargetDirectory, config.FileSystemWriter)
+		reporter  = stations.NewReporter(config.Logger, failure)
 
 		pipeline = pipelines.New(input,
 			pipelines.Options.Logger(config.Logger),
